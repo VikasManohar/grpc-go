@@ -3,11 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/vikasmanohar/grpc-go/calculator/calPb"
-	"google.golang.org/grpc"
+	"io"
 	"log"
 	"net"
 	"time"
+
+	"github.com/vikasmanohar/grpc-go/calculator/calPb"
+	"google.golang.org/grpc"
 )
 
 type server struct{}
@@ -43,6 +45,29 @@ func (s *server) Sum(ctx context.Context, req *calPb.Input) (*calPb.Result, erro
 		Res: input1 + input2,
 	}
 	return res, nil
+}
+
+func (s *server) ComputeAverage(stream calPb.CalculatorService_ComputeAverageServer) error {
+	fmt.Println("Inside ComputeAverage")
+	requests := make([]int32, 0)
+	for {
+		input, err := stream.Recv()
+		if err == io.EOF {
+			res := 0.0
+			sum := 0
+			for _, v := range requests {
+				sum += int(v)
+			}
+			res = float64(sum) / float64(len(requests))
+			return stream.SendAndClose(&calPb.ComputeAverageResponse{
+				Res: float32(res),
+			})
+		}
+		if err != nil {
+			log.Fatalf("error while receiving request from Client %v\n", err)
+		}
+		requests = append(requests, input.GetInput())
+	}
 }
 
 func main() {

@@ -3,10 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/vikasmanohar/grpc-go/calculator/calPb"
-	"google.golang.org/grpc"
 	"io"
 	"log"
+	"time"
+
+	"github.com/vikasmanohar/grpc-go/calculator/calPb"
+	"google.golang.org/grpc"
 )
 
 func main() {
@@ -25,6 +27,8 @@ func main() {
 	doUnary(c)
 
 	doServerStreaming(c)
+
+	doClientStreaming(c)
 }
 
 func doUnary(c calPb.CalculatorServiceClient) {
@@ -60,4 +64,43 @@ func doServerStreaming(c calPb.CalculatorServiceClient) {
 			fmt.Print(msg.Res, ",")
 		}
 	}
+}
+
+func doClientStreaming(c calPb.CalculatorServiceClient) {
+	fmt.Println("Inside Client Streaming Client")
+
+	requests := []*calPb.ComputeAverageRequest{
+		{
+			Input: 1,
+		},
+		{
+			Input: 2,
+		},
+		{
+			Input: 3,
+		},
+		{
+			Input: 4,
+		},
+	}
+
+	stream, err := c.ComputeAverage(context.Background())
+	if err != nil {
+		log.Fatalln("Error calling PrimeNumberDecomposition")
+	}
+	fmt.Println("Average of numbers ")
+
+	for _, req := range requests {
+		fmt.Print(req.GetInput(), " ")
+		err := stream.Send(req)
+		if err != nil {
+			log.Fatalln("error calling ComputeAverage", err)
+		}
+		time.Sleep(1000 * time.Millisecond)
+	}
+	res, err := stream.CloseAndRecv()
+	if err != nil {
+		log.Fatalln("Error receiving response from ComputeAverage", err)
+	}
+	fmt.Println("is ", res.GetRes())
 }
