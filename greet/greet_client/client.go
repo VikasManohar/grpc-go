@@ -80,22 +80,22 @@ func doClientStreaming(c greetpb.GreetServiceClient) {
 	fmt.Println("========================")
 	fmt.Println("Inside ClientStreaming client")
 	requests := []*greetpb.LongGreetRequest{
-		&greetpb.LongGreetRequest{
+		{
 			Greeting: &greetpb.Greeting{
 				FirstName: "Jon",
 			},
 		},
-		&greetpb.LongGreetRequest{
+		{
 			Greeting: &greetpb.Greeting{
 				FirstName: "Bob",
 			},
 		},
-		&greetpb.LongGreetRequest{
+		{
 			Greeting: &greetpb.Greeting{
 				FirstName: "Tim",
 			},
 		},
-		&greetpb.LongGreetRequest{
+		{
 			Greeting: &greetpb.Greeting{
 				FirstName: "Pony",
 			},
@@ -118,5 +118,5 @@ func doClientStreaming(c greetpb.GreetServiceClient) {
 	if err != nil {
 		log.Fatalln("error receiving response from LongGreet ", err)
 	}
-	fmt.Println("resopnse from LongGreet ", res)
+	fmt.Println("resopnse from LongGreet ", res.Result)
 }
