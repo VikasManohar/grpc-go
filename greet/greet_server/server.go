@@ -3,12 +3,14 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/vikasmanohar/grpc-go/greet/greetpb"
-	"google.golang.org/grpc"
+	"io"
 	"log"
 	"net"
 	"strconv"
 	"time"
+
+	"github.com/vikasmanohar/grpc-go/greet/greetpb"
+	"google.golang.org/grpc"
 )
 
 type server struct{}
@@ -39,6 +41,24 @@ func (s *server) GreetManyTimes(req *greetpb.GreetManyTimesRequest, stream greet
 		time.Sleep(1000 * time.Millisecond)
 	}
 	return nil
+}
+
+func (s *server) LongGreet(stream greetpb.GreetService_LongGreetServer) error {
+	fmt.Println("LongGreet server function invoked with streaming request")
+	result := ""
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			//client has sent all the requests
+			return stream.SendAndClose(&greetpb.LongGreetResponse{
+				Result: result,
+			})
+		}
+		if err != nil {
+			log.Fatalf("Error with client stream %v\n", err)
+		}
+		result += "Hello " + req.GetGreeting().GetFirstName() + "! "
+	}
 }
 
 func main() {
