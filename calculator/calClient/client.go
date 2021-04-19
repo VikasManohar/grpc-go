@@ -24,11 +24,13 @@ func main() {
 		}
 	}()
 	c := calPb.NewCalculatorServiceClient(cc)
-	doUnary(c)
+	// doUnary(c)
 
-	doServerStreaming(c)
+	// doServerStreaming(c)
 
-	doClientStreaming(c)
+	// doClientStreaming(c)
+
+	doBiDiStreaming(c)
 }
 
 func doUnary(c calPb.CalculatorServiceClient) {
@@ -103,4 +105,66 @@ func doClientStreaming(c calPb.CalculatorServiceClient) {
 		log.Fatalln("Error receiving response from ComputeAverage", err)
 	}
 	fmt.Println("is ", res.GetRes())
+}
+
+func doBiDiStreaming(c calPb.CalculatorServiceClient) {
+	fmt.Println("Inside Bi Directional Streaming Client")
+
+	requests := []*calPb.FindMaximumRequest{
+		{
+			Input: 1,
+		},
+		{
+			Input: 5,
+		},
+		{
+			Input: 3,
+		},
+		{
+			Input: 6,
+		},
+		{
+			Input: 2,
+		},
+		{
+			Input: 20,
+		},
+	}
+	stream, err := c.FindMaximum(context.Background())
+	if err != nil {
+		log.Fatalln("error while trying to create client stream ", err)
+	}
+	waitChan := make(chan struct{})
+	waitPrintChan := make(chan struct{})
+	fmt.Println("The numbers are ")
+	go func() {
+		for _, req := range requests {
+			fmt.Println(req.GetInput(), " ")
+			err := stream.Send(&calPb.FindMaximumRequest{
+				Input: req.GetInput(),
+			})
+			if err != nil {
+				log.Fatalln("Error sending request to the server ", err)
+			}
+			waitPrintChan <- struct{}{}
+			// time.Sleep(1000 * time.Millisecond)
+		}
+		stream.CloseSend()
+	}()
+
+	go func() {
+		for {
+			<-waitPrintChan
+			res, err := stream.Recv()
+			if err == io.EOF {
+				break
+			}
+			if err != nil {
+				log.Fatalln("Error getting response from server ", err)
+			}
+			fmt.Println("max number so far : ", res.GetRes())
+		}
+		close(waitChan)
+	}()
+	<-waitChan
 }
