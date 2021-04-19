@@ -92,8 +92,6 @@ func (s *server) FindMaximum(stream calPb.CalculatorService_FindMaximumServer) e
 			}
 		}
 	}
-	return nil
-
 }
 func main() {
 	fmt.Println("Inside server code of CalculatorService")
