@@ -135,7 +135,6 @@ func doBiDiStreaming(c calPb.CalculatorServiceClient) {
 		log.Fatalln("error while trying to create client stream ", err)
 	}
 	waitChan := make(chan struct{})
-	waitPrintChan := make(chan struct{})
 	fmt.Println("The numbers are ")
 	go func() {
 		for _, req := range requests {
@@ -146,15 +145,13 @@ func doBiDiStreaming(c calPb.CalculatorServiceClient) {
 			if err != nil {
 				log.Fatalln("Error sending request to the server ", err)
 			}
-			waitPrintChan <- struct{}{}
-			// time.Sleep(1000 * time.Millisecond)
+			time.Sleep(1000 * time.Millisecond)
 		}
 		stream.CloseSend()
 	}()
 
 	go func() {
 		for {
-			<-waitPrintChan
 			res, err := stream.Recv()
 			if err == io.EOF {
 				break
