@@ -1,0 +1,16 @@
+""" SERVER """
+docker build -t calserver:latest .
+docker ps -a
+docker ps
+docker rm container_name
+docker kill containerID
+docker run -it calserver sh
+
+$ docker run -p 50051:50051 --network host calserver:latest
+WARNING: Published ports are discarded when using host network mode
+
+""" CLIENT """
+docker build -t calclient:latest .
+docker run -it calclient
+$ docker run -p 50051:50051 --network host calclient:latest
+WARNING: Published ports are discarded when using host network mode

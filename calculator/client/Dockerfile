@@ -13,13 +13,3 @@ EXPOSE 50051
 
 #start the "server" exeutable
 CMD ["./client"]
-
-
-
-
-
-
-# FROM golang:alpine
-# COPY calculator /go/src/calculator
-# WORKDIR /go/src/calculator
-# RUN go run calClient/*.go
