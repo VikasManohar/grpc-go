@@ -13,7 +13,7 @@ import (
 
 func main() {
 	fmt.Println("Inside CalculatorService Client")
-	cc, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
+	cc, err := grpc.Dial("0.0.0.0:50051", grpc.WithInsecure())
 	if err != nil {
 		log.Fatalln("Error connecting to the server", err)
 	}
