@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package calculator;
+
+option go_package = "calculator/calPb";
+
+//Rename to SumRequest
+message input {
+  int32 in1 = 1;
+  int32 in2 = 2;
+}
+
+//Rename to SumResponse
+message  result {
+  int32 res = 1;
+}
+
+message PrimeNumbeRequest {
+  int32 int1 = 1;
+}
+
+message PrimeNumberResponse {
+  int32 res = 1;
+}
+
+message ComputeAverageRequest {
+  int32 input = 1;
+}
+
+message ComputeAverageResponse {
+  float res = 1;
+}
+
+message FindMaximumRequest {
+  int32 input = 1;
+}
+
+message FindMaximumResponse {
+  int32 res = 1;
+}
+
+service CalculatorService {
+  //unary
+  rpc sum(input) returns(result) {};
+
+  //server streaming
+  rpc PrimeNumberDecomposition(PrimeNumbeRequest) returns (stream PrimeNumberResponse) {};
+
+  //client streaming
+  rpc ComputeAverage(stream ComputeAverageRequest) returns (ComputeAverageResponse) {};
+
+  //Bi Directional Streaming
+  rpc FindMaximum(stream FindMaximumRequest) returns (stream FindMaximumResponse) {};
+}

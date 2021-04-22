@@ -24,16 +24,17 @@ func main() {
 		}
 	}()
 	c := calPb.NewCalculatorServiceClient(cc)
-	// doUnary(c)
+	doUnary(c)
 
-	// doServerStreaming(c)
+	doServerStreaming(c)
 
-	// doClientStreaming(c)
+	doClientStreaming(c)
 
 	doBiDiStreaming(c)
 }
 
 func doUnary(c calPb.CalculatorServiceClient) {
+	fmt.Println("Inside unary Client")
 	req := &calPb.Input{
 		In1: 33,
 		In2: 99,
@@ -46,7 +47,7 @@ func doUnary(c calPb.CalculatorServiceClient) {
 }
 
 func doServerStreaming(c calPb.CalculatorServiceClient) {
-	fmt.Println("Inside Server Streaming Client")
+	fmt.Println("Inside Server Streaming Client:")
 	n := 99
 	req := &calPb.PrimeNumbeRequest{
 		Int1: int32(n),
